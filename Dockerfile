@@ -1,14 +1,18 @@
-# Use an official JDK runtime as a parent image
-FROM eclipse-temurin:21-jdk-alpine
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the executable jar file from the target directory to the container
-COPY target/*.jar app.jar
+COPY pom.xml .
+COPY src ./src
 
-# Expose the port the app runs on
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jre-jammy
+
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Run the jar file
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
