@@ -1,18 +1,13 @@
-FROM maven:3.9.6-eclipse-temurin-21 AS builder
+FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 
-COPY pom.xml .
-COPY src ./src
+COPY . .
 
-RUN mvn clean package -DskipTests
+RUN chmod +x mvnw
 
-FROM eclipse-temurin:21-jre-jammy
-
-WORKDIR /app
-
-COPY --from=builder /app/target/*.jar app.jar
+RUN ./mvnw clean package -DskipTests
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
+CMD ["java", "-jar", "target/backend-spring-boot-0.0.1-SNAPSHOT.jar"]
