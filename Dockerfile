@@ -2,7 +2,7 @@ FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
-COPY pom.xml .
+COPY pom.xml ./
 COPY src ./src
 
 RUN mvn clean package -DskipTests
@@ -13,6 +13,6 @@ WORKDIR /app
 
 COPY --from=builder /app/target/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 10000
 
-CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
+CMD ["sh", "-c", "java ${JAVA_OPTS} -Dserver.port=${PORT:-10000} -jar app.jar"]
